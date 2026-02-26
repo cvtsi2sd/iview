@@ -70,6 +70,7 @@ class Viewer(QW):
         self.timer.start(250)
         self.pos = None
         self.tracking = None
+        self._wheel_accum = 0
         self.tools = []
         self.vector_overlay = []
         self.load(0)
@@ -401,7 +402,9 @@ class Viewer(QW):
         k = 1.01 if (int(e.modifiers()) & Qt.ShiftModifier) != 0 else 1.2
         self.pos = (e.x() - self.tx) / self.scale, (e.y() - self.ty) / self.scale
         sf = self.scale
-        d = int(e.angleDelta().y() / 120.)
+        self._wheel_accum += e.angleDelta().y()
+        d = int(self._wheel_accum / 120.)
+        self._wheel_accum -= d * 120
         while d > 0:
             sf *= k
             d -= 1
