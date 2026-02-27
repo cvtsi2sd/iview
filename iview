@@ -70,7 +70,6 @@ class Viewer(QW):
         self.timer.start(250)
         self.pos = None
         self.tracking = None
-        self._wheel_accum = 0
         self.tools = []
         self.vector_overlay = []
         self.load(0)
@@ -401,16 +400,7 @@ class Viewer(QW):
     def wheelEvent(self, e):
         k = 1.01 if (int(e.modifiers()) & Qt.ShiftModifier) != 0 else 1.2
         self.pos = (e.x() - self.tx) / self.scale, (e.y() - self.ty) / self.scale
-        sf = self.scale
-        self._wheel_accum += e.angleDelta().y()
-        d = int(self._wheel_accum / 120.)
-        self._wheel_accum -= d * 120
-        while d > 0:
-            sf *= k
-            d -= 1
-        while d < 0:
-            sf /= k
-            d += 1
+        sf = self.scale * (k ** (e.angleDelta().y() / 120.))
         if sf < 0.01:
             sf = 0.01
         if sf > 10000:
